@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8">
+    <title>Quiz de Sustentabilidade</title>
+    <link rel="stylesheet" href="/static/quizstyle.css">
+  </head>
+  <body>
+    <h1>Quiz de Sustentabilidade</h1>
+
+    <form action="/quiz" method="post">
+      {% for q in questions %}
+      <div class="pergunta">
+        <h3 class="{% if q.is_bonus %}bonus{% endif %}">
+          {{ q.text }} {% if q.is_bonus %}★ Bônus!{% endif %}
+        </h3>
+        {% for alt in q.alternatives %}
+        <label>
+          <input type="radio" name="{{ q.id }}" value="{{ alt.id }}" required>
+          {{ alt.text }}
+        </label><br>
+        {% endfor %}
+      </div>
+      <hr>
+      {% endfor %}
+      <button type="submit">Enviar respostas</button>
+    </form>
+  </body>
+</html>

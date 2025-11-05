@@ -13,4 +13,4 @@ def form_home(request:Request):
 @router.post("/add_user")
 def add_user(name: str = Form(...)):
     db.users.insert_one({"name": name})
-    return RedirectResponse ("/", status_code=303)
+    return RedirectResponse ("/quiz", status_code=303)
