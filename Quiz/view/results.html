@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/resultsstyle.css">
+    <title>Resultados do Quiz</title>
+</head>
+<body>
+    <h1>Seus Resultados</h1>
+
+    <!-- Container para resultados do usuário -->
+    <div class="user-result">
+        <h2>Seu Desempenho</h2>
+        <p>Total de Perguntas: {{ user_result.total_questions }}</p>
+        <p>Acertos: {{ user_result.correct_answers }}</p>
+        <p>Pontuação: {{ user_result.total_score }}</p>
+        <p>Percentual: {{ user_result.percentage }}%</p>
+    </div>
+
+    <!-- Container para ranking -->
+    <div class="ranking">
+        <h2>Ranking</h2>
+        <table>
+            <tr>
+                <th>Posição</th>
+                <th>Nome</th>
+                <th>Pontuação</th>
+            </tr>
+            {% for user in ranking %}
+            <tr {% if user.users_id == user_result.users_id %} class="current-user" {% endif %}>
+                <td>{{ loop.index }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.total_score }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

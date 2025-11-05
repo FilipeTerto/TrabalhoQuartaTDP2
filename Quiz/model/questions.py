@@ -5,7 +5,7 @@ from bson import ObjectId
 class Question(BaseModel):
     id: Optional[str] = Field(default=None, alias="_id")    
     text: str
-    alternatives: List[Dict[str, str]]
+    alternatives: List[Dict[str, str]]  # espera {"id": "...", "text": "..."}
     correct_answer_id: int
 
     class Config:

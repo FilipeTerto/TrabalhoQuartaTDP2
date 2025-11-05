@@ -7,17 +7,26 @@ from bson import ObjectId
 router = APIRouter()
 templates = Jinja2Templates(directory="view")
 
+
 @router.post("/quiz/submit", response_class=HTMLResponse)
 async def submit_quiz(request: Request):
+    """
+    Recebe as respostas do quiz, salva no banco, calcula score,
+    atualiza ranking e exibe os resultados.
+    """
     form = await request.form()
     answers = dict(form)
 
-    # Aqui, só um exemplo de user_id fixo
-    user_id = "6900aefe1b83af9368dd1c15"
+    # Pega user_id do hidden input enviado pelo formulário
+    user_id = answers.get("user_id")
+    if not user_id:
+        return HTMLResponse("Erro: user_id não fornecido", status_code=400)
 
+    # Buscar todas as perguntas do banco
     questions_data = list(db.questions.find())
     score = 0
 
+    # Processa cada resposta
     for q in questions_data:
         qid_str = str(q["_id"])
         if qid_str in answers:
@@ -27,6 +36,7 @@ async def submit_quiz(request: Request):
             if is_correct:
                 score += 1
 
+            # Salva a resposta do usuário
             db.answers.insert_one({
                 "users_id": user_id,
                 "questions_id": qid_str,
@@ -36,6 +46,7 @@ async def submit_quiz(request: Request):
     total_questions = len(questions_data)
     percentage = int(score / total_questions * 100)
 
+    # Salva resultado final do usuário
     db.results.insert_one({
         "users_id": user_id,
         "total_score": score,
@@ -52,12 +63,20 @@ async def submit_quiz(request: Request):
         upsert=True
     )
 
+    # Buscar ranking completo
+    ranking_list = list(db.ranking.find().sort("total_score", -1))
+
     return templates.TemplateResponse(
-        "result.html",
+        "results.html",
         {
             "request": request,
-            "score": score,
-            "total": total_questions,
-            "percentage": percentage
+            "user_result": {
+                "users_id": user_id,
+                "total_questions": total_questions,
+                "correct_answers": score,
+                "total_score": score,
+                "percentage": percentage
+            },
+            "ranking": ranking_list
         }
     )
